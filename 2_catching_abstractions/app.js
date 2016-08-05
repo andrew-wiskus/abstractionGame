@@ -30,15 +30,16 @@ var threeScum = new Character('C', 6, true);
 var fourScum = new Character('D', 7, true);
 
 var firstRoster = new Roster([katniss, peeta, haymitch, johanna, oneScum, twoScum, threeScum, fourScum]);
+
 conclusion(firstRoster.heroes, firstRoster.villians, 0, 0);
 
 
-console.log("ObjectPrint?:", Roster([katniss, peeta, haymitch, johanna, oneScum, twoScum, threeScum, fourScum]).heroes);
 
-function Roster(playerArray) {
+
+function Roster(allPlayers) {
     var villians = [];
     var heroes = [];
-    playerArray.forEach(function(player) {
+    allPlayers.forEach(function(player) {
         if (player.isVillain) {
             villians.push(player);
         } else {
@@ -50,7 +51,6 @@ function Roster(playerArray) {
     this.villians = villians;
     console.log(this);
 }
-
 // create 10 matches
 // match a random hero with a random capitol villain from list of heroes/villians
 function createRandomMatches(heroList, villianList) {
