@@ -11,10 +11,10 @@
  */
 
 function Character(name, luck, isVillain) {
-  this.name = name;
-  this.luck = luck;
-  this.isVillain = isVillain;
-  this.isAlive = true;
+    this.name = name;
+    this.luck = luck;
+    this.isVillain = isVillain;
+    this.isAlive = true;
 }
 
 // heroes
@@ -29,105 +29,126 @@ var twoScum = new Character('B', 5, true);
 var threeScum = new Character('C', 6, true);
 var fourScum = new Character('D', 7, true);
 
-var heroes = [katniss, peeta, haymitch, johanna];
+var firstRoster = new Roster([katniss, peeta, haymitch, johanna, oneScum, twoScum, threeScum, fourScum]);
+conclusion(firstRoster.heroes, firstRoster.villians, 0, 0);
 
-console.log('Our heroes at the start', heroes);
 
-var capitol = [oneScum, twoScum, threeScum, fourScum];
+console.log("ObjectPrint?:", Roster([katniss, peeta, haymitch, johanna, oneScum, twoScum, threeScum, fourScum]).heroes);
 
-console.log('The villains at the start', capitol);
+function Roster(playerArray) {
+    var villians = [];
+    var heroes = [];
+    playerArray.forEach(function(player) {
+        if (player.isVillain) {
+            villians.push(player);
+        } else {
+            heroes.push(player);
+        }
 
-var matches = [];
-
-var heroWins = 0; // number of times a hero has won a match
-var capitolWins = 0; // number of times a capitol villain has won a match
-
-// create 10 matches
-// match a random hero with a random capitol villain
-for (var i = 0; i < 10; i++) {
-  var match = [];
-
-  var hero = randomWholeNumber(0, heroes.length - 1);
-  match.push(heroes[hero]);
-
-  var villain = randomWholeNumber(0, capitol.length - 1);
-  match.push(capitol[villain]);
-
-  matches.push(match);
+    });
+    this.heroes = heroes;
+    this.villians = villians;
+    console.log(this);
 }
 
-console.log('Our scheduled matches', matches);
+// create 10 matches
+// match a random hero with a random capitol villain from list of heroes/villians
+function createRandomMatches(heroList, villianList) {
+    var randomMatches = [];
 
-// determine the winner and loser for each match
-matches.forEach(function (element) {
+    for (var i = 0; i < 10; i++) {
+        var match = [];
 
-  if (element[0].isAlive && element[1].isAlive) { // if both contestants alive, run the match
-    if (element[0].luck > element[1].luck) { // if hero luck greater than villain luck
-      heroWins++; // add a win for the heroes
+        var hero = randomWholeNumber(0, heroList.length - 1);
+        match.push(heroList[hero]);
 
-      element[0].luck++; // increase the hero's luck
-      if (element[0].luck > 10) { // winner's luck cannot be above 10
-        element[0].luck = 10;
-      }
+        var villain = randomWholeNumber(0, villianList.length - 1);
+        match.push(villianList[villain]);
 
-      element[1].luck--; // decrease the villain's luck
-      if (element[1].luck < 0) { // if the luck falls below zero, character is dead
-        element[1].isAlive = false;
-      }
-    } else if (element[0].luck < element[1].luck) { // if hero luck less than villain luck, villain wins
-      capitolWins++; // add a win for the capitol/villains
-
-      element[1].luck++; // increase the villain's luck
-      if (element[1].luck > 10) { // winner's luck cannot be above 10
-        element[1].luck = 10;
-      }
-
-      element[0].luck--; // decrease the hero's luck
-      if (element[0].luck < 0) { // if the luck falls below zero, character is dead
-        element[0].isAlive = false;
-      }
+        randomMatches.push(match);
     }
-  } else if (!element[1].isAlive && element[0].isAlive) { // if the villain is not alive, but the hero is, automatic win for hero
-    heroWins++; // add a win for the heroes
+    return randomMatches;
+}
 
-    element[0].luck++; // increase the hero's luck
-    if (element[0].luck > 10) { // winner's luck cannot be above 10
-      element[0].luck = 10;
-    }
+// determine the winner and loser for each match, returns score
+function runMatches(theHeroes, theVillians, heroesScore, villiansScore) {
+    var matchList = createRandomMatches(theHeroes, theVillians);
+    var score = {
+        heroes: heroesScore,
+        villians: villiansScore
+    };
 
-    element[1].luck--; // decrease the villain's luck
-    if (element[1].luck < 0) { // if the luck falls below zero, character is dead
-      element[1].isAlive = false;
-    }
-  } else if (!element[0].isAlive && element[1].isAlive) { // if the hero is not alive, but the villain is, automatic win for villain
-    capitolWins++; // add a win for the capitol/villains
+    matchList.forEach(function(element) {
 
-    element[1].luck++; // increase the villain's luck
-    if (element[1].luck > 10) { // winner's luck cannot be above 10
-      element[1].luck = 10;
-    }
+        if (element[0].isAlive && element[1].isAlive) { // if both contestants alive, run the match
+            if (element[0].luck > element[1].luck) { // if hero luck greater than villain luck
+                score.heroes++; // add a win for the heroes
 
-    element[0].luck--; // decrease the hero's luck
-    if (element[0].luck < 0) { // if the luck falls below zero, character is dead
-      element[0].isAlive = false;
-    }
-  }
-});
+                element[0].luck++; // increase the hero's luck
+                if (element[0].luck > 10) { // winner's luck cannot be above 10
+                    element[0].luck = 10;
+                }
 
-conclusion();
+                element[1].luck--; // decrease the villain's luck
+                if (element[1].luck < 0) { // if the luck falls below zero, character is dead
+                    element[1].isAlive = false;
+                }
+            } else if (element[0].luck < element[1].luck) { // if hero luck less than villain luck, villain wins
+                score.villians++; // add a win for the capitol/villains
+
+                element[1].luck++; // increase the villain's luck
+                if (element[1].luck > 10) { // winner's luck cannot be above 10
+                    element[1].luck = 10;
+                }
+
+                element[0].luck--; // decrease the hero's luck
+                if (element[0].luck < 0) { // if the luck falls below zero, character is dead
+                    element[0].isAlive = false;
+                }
+            }
+        } else if (!element[1].isAlive && element[0].isAlive) { // if the villain is not alive, but the hero is, automatic win for hero
+            score.heroes++; // add a win for the heroes
+
+            element[0].luck++; // increase the hero's luck
+            if (element[0].luck > 10) { // winner's luck cannot be above 10
+                element[0].luck = 10;
+            }
+
+            element[1].luck--; // decrease the villain's luck
+            if (element[1].luck < 0) { // if the luck falls below zero, character is dead
+                element[1].isAlive = false;
+            }
+        } else if (!element[0].isAlive && element[1].isAlive) { // if the hero is not alive, but the villain is, automatic win for villain
+            score.villians++; // add a win for the capitol/villains
+
+            element[1].luck++; // increase the villain's luck
+            if (element[1].luck > 10) { // winner's luck cannot be above 10
+                element[1].luck = 10;
+            }
+
+            element[0].luck--; // decrease the hero's luck
+            if (element[0].luck < 0) { // if the luck falls below zero, character is dead
+                element[0].isAlive = false;
+            }
+        }
+    });
+
+    return score;
+}
 
 // display the results of our matches in the console
-function conclusion() {
-  console.log('Heroes at conclusion', heroes);
-  console.log('Villains at conclusion', capitol);
+function conclusion(theHeroes, theVillians, currentHeroScore, currentVillianScore) {
+    var score = runMatches(theHeroes, theVillians, currentHeroScore, currentVillianScore);
+    console.log('Heroes at conclusion', score.heroes);
+    console.log('Villains at conclusion', score.villians);
 
-  if (capitolWins > heroWins) {
-    console.log('Not really the ending we were hoping for');
-  } else {
-    console.log('We did it!');
-  }
+    if (score.villians > score.heroes) {
+        console.log('Not really the ending we were hoping for');
+    } else {
+        console.log('We did it!');
+    }
 }
 
 function randomWholeNumber(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
+    return Math.floor(Math.random() * (max - min) + min);
 }
